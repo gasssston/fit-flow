@@ -98,9 +98,24 @@ create table if not exists public.custom_running_notations (
     created_at timestamptz not null default now()
 );
 
+-- =============================================
+-- ABS PLANNINGS (saved circuits)
+-- =============================================
+create table if not exists public.abs_plannings (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid references auth.users(id) not null,
+    name text not null,
+    exercise_ids text[] not null,
+    work_seconds int not null default 20,
+    rest_seconds int not null default 10,
+    rounds int not null default 1,
+    created_at timestamptz not null default now()
+);
+
 alter table public.ab_workout_logs enable row level security;
 alter table public.running_workout_logs enable row level security;
 alter table public.custom_running_notations enable row level security;
+alter table public.abs_plannings enable row level security;
 
 drop policy if exists "own rows only" on public.ab_workout_logs;
 create policy "own rows only" on public.ab_workout_logs
@@ -112,4 +127,8 @@ create policy "own rows only" on public.running_workout_logs
 
 drop policy if exists "own rows only" on public.custom_running_notations;
 create policy "own rows only" on public.custom_running_notations
+    for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "own rows only" on public.abs_plannings;
+create policy "own rows only" on public.abs_plannings
     for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
