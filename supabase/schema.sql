@@ -79,6 +79,7 @@ create table if not exists public.ab_workout_logs (
     work_seconds int not null,
     rest_seconds int not null,
     rounds int not null,
+    duration_seconds int not null default 0 check (duration_seconds >= 0),
     completed_at timestamptz not null default now()
 );
 
@@ -87,8 +88,20 @@ create table if not exists public.running_workout_logs (
     user_id uuid references auth.users(id) not null,
     title text not null,
     raw_notation text not null,
+    duration_seconds int not null default 0 check (duration_seconds >= 0),
     completed_at timestamptz not null default now()
 );
+
+-- Add progress fields when upgrading an existing project.
+alter table public.ab_workout_logs
+    add column if not exists duration_seconds int not null default 0 check (duration_seconds >= 0);
+alter table public.running_workout_logs
+    add column if not exists duration_seconds int not null default 0 check (duration_seconds >= 0);
+
+create index if not exists ab_workout_logs_user_completed_idx
+    on public.ab_workout_logs (user_id, completed_at desc);
+create index if not exists running_workout_logs_user_completed_idx
+    on public.running_workout_logs (user_id, completed_at desc);
 
 create table if not exists public.custom_running_notations (
     id uuid primary key default gen_random_uuid(),

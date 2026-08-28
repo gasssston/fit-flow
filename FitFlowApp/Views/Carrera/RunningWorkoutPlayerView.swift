@@ -4,6 +4,8 @@ struct RunningWorkoutPlayerView: View {
     let session: RunningSession
     @StateObject private var engine: IntervalTimerEngine
     @Environment(\.dismiss) private var dismiss
+    @State private var didSaveWorkout = false
+    @State private var saveError: String?
 
     init(session: RunningSession) {
         self.session = session
@@ -29,7 +31,7 @@ struct RunningWorkoutPlayerView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: DS.Spacing.xl) {
             if engine.isFinished {
                 CompletionView { dismiss() }
             } else if let step = engine.currentStep {
@@ -39,7 +41,7 @@ struct RunningWorkoutPlayerView: View {
                     .font(.subheadline).foregroundStyle(.secondary)
 
                 Text(step.subtitle ?? "")
-                    .font(.system(size: 34, weight: .heavy, design: .rounded))
+                    .font(.system(size: DS.FontSize.title, weight: .heavy, design: .rounded))
                     .foregroundStyle(accentColor)
 
                 if step.seconds != nil {
@@ -52,9 +54,7 @@ struct RunningWorkoutPlayerView: View {
                     )
                     .frame(maxWidth: 280)
                 } else {
-                    // Distance segment, free note, or open stopwatch: no fixed
-                    // duration — count elapsed time up and let the user advance.
-                    VStack(spacing: 12) {
+                    VStack(spacing: DS.Spacing.md) {
                         Text(step.title)
                             .font(.title3.bold())
                             .multilineTextAlignment(.center)
@@ -66,9 +66,8 @@ struct RunningWorkoutPlayerView: View {
                             engine.markManualStepDone()
                         } label: {
                             Label("Hecho — siguiente", systemImage: "checkmark")
-                                .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(PrimaryButtonStyle())
                         .padding(.horizontal, 40)
                     }
                     .padding(.vertical, 40)
@@ -88,37 +87,53 @@ struct RunningWorkoutPlayerView: View {
         .navigationTitle(session.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { engine.start() }
+        .onChange(of: engine.isFinished) { _, isFinished in
+            guard isFinished, !didSaveWorkout else { return }
+            didSaveWorkout = true
+            Task {
+                do {
+                    try await SupabaseService.shared.saveRunningWorkout(
+                        session: session,
+                        durationSeconds: Int(engine.totalActiveElapsed.rounded())
+                    )
+                } catch {
+                    saveError = error.localizedDescription
+                }
+            }
+        }
+        .alert("No se pudo guardar la carrera", isPresented: Binding(
+            get: { saveError != nil },
+            set: { if !$0 { saveError = nil } }
+        )) {
+            Button("Aceptar", role: .cancel) {}
+        } message: {
+            Text(saveError ?? "Inténtalo de nuevo más tarde.")
+        }
     }
 
     private func colorFor(_ step: TimedStep) -> Color {
         switch step.subtitle {
-        case "RA": return .red
-        case "RM": return .orange
-        case "RS": return .green
+        case "RA": return DS.Colors.ritmoAlto
+        case "RM": return DS.Colors.ritmoMedio
+        case "RS": return DS.Colors.ritmoSuave
         default: return PhaseColor.color(for: step.accent)
         }
     }
 
     private var controls: some View {
-        HStack(spacing: 28) {
-            Button {
-                engine.toggle()
-            } label: {
-                Image(systemName: engine.isRunning ? "pause.fill" : "play.fill")
-                    .font(.title)
-                    .frame(width: 64, height: 64)
-                    .background(.thinMaterial, in: Circle())
-            }
-            Button {
-                engine.skip()
-            } label: {
-                Image(systemName: "forward.end.fill")
-                    .font(.title2)
-                    .frame(width: 52, height: 52)
-                    .background(.thinMaterial, in: Circle())
-            }
+        HStack(spacing: DS.Spacing.xl) {
+            PlayerControlButton(
+                systemName: engine.isRunning ? "pause.fill" : "play.fill",
+                action: { engine.toggle() }
+            )
+            PlayerControlButton(
+                systemName: "forward.end.fill",
+                size: 52,
+                font: .title2,
+                action: { engine.skip() }
+            )
         }
-        .padding(.bottom, 12)
+        .padding(.bottom, DS.Spacing.md)
     }
 
     private func formatted(_ seconds: Int) -> String {

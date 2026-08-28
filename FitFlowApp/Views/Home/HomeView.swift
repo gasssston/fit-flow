@@ -2,36 +2,39 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject private var appState: AppState
+    @State private var selectedTab = 0
 
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    NavigationLink {
-                        AbsWorkoutPickerView()
-                    } label: {
-                        Label("Circuito de abdominales", systemImage: "flame.fill")
-                    }
-                    NavigationLink {
-                        RunningWorkoutPickerView()
-                    } label: {
-                        Label("Entrenos de carrera", systemImage: "figure.run")
-                    }
+        TabView(selection: $selectedTab) {
+            HomeTabView()
+                .environmentObject(appState)
+                .tabItem {
+                    Label("Inicio", systemImage: "house.fill")
                 }
+                .tag(0)
 
-                Section {
-                    if let email = appState.userEmail {
-                        Text(email).foregroundStyle(.secondary)
-                    }
-                    Button("Cerrar sesión", role: .destructive) {
-                        Task {
-                            try? await SupabaseService.shared.signOut()
-                            appState.refreshFromSupabase()
-                        }
-                    }
-                }
+            NavigationStack {
+                AbsPlanningsListView()
             }
-            .navigationTitle("FitFlow")
+            .tabItem {
+                Label("Abdominales", systemImage: "flame.fill")
+            }
+            .tag(1)
+
+            NavigationStack {
+                RunningWorkoutPickerView()
+            }
+            .tabItem {
+                Label("Carrera", systemImage: "figure.run")
+            }
+            .tag(2)
+
+            ProfileView()
+                .environmentObject(appState)
+                .tabItem {
+                    Label("Perfil", systemImage: "person.fill")
+                }
+                .tag(3)
         }
     }
 }

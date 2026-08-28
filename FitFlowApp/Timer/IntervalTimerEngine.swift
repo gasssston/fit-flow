@@ -24,6 +24,7 @@ final class IntervalTimerEngine: ObservableObject {
     @Published private(set) var isRunning: Bool = false
     @Published private(set) var isFinished: Bool = false
     @Published private(set) var elapsedInManualStep: Double = 0 // for distance/stopwatch steps
+    @Published private(set) var totalActiveElapsed: Double = 0
 
     private var timer: AnyCancellable?
     private let beeper = BeepPlayer()
@@ -81,11 +82,13 @@ final class IntervalTimerEngine: ObservableObject {
         currentIndex = 0
         isFinished = false
         elapsedInManualStep = 0
+        totalActiveElapsed = 0
         remaining = Double(steps.first?.seconds ?? 0)
     }
 
     private func tick() {
         guard let step = currentStep else { return }
+        totalActiveElapsed += 0.1
         guard let total = step.seconds else {
             elapsedInManualStep += 0.1
             return
