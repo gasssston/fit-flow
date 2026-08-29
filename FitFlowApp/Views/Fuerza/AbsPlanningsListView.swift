@@ -107,6 +107,7 @@ struct AbsPlanningsListView: View {
         isLoading = true
         do {
             plannings = try await SupabaseService.shared.fetchPlannings()
+            PhoneWatchConnectivity.shared.publish(absPlannings: plannings)
         } catch {
             print("Failed to load plannings: \(error)")
         }
@@ -118,6 +119,7 @@ struct AbsPlanningsListView: View {
             do {
                 try await SupabaseService.shared.deletePlanning(id: planning.id)
                 plannings.removeAll { $0.id == planning.id }
+                PhoneWatchConnectivity.shared.publish(absPlannings: plannings)
             } catch {
                 print("Failed to delete planning: \(error)")
             }
@@ -153,9 +155,7 @@ private struct SaveToast: Equatable {
 private struct AbsPlanningStartView: View {
     let planning: AbsPlanning
 
-    @State private var countdown: Int?
     @State private var showWorkout = false
-    @State private var countdownTask: Task<Void, Never>?
 
     var body: some View {
         VStack(spacing: DS.Spacing.xl) {
@@ -177,14 +177,6 @@ private struct AbsPlanningStartView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            if let countdown {
-                Text("\(countdown)")
-                    .font(.system(size: DS.FontSize.hero, weight: .black, design: .rounded))
-                    .monospacedDigit()
-                    .contentTransition(.numericText())
-                    .accessibilityLabel("El entrenamiento comienza en \(countdown) segundos")
-            }
-
             Spacer()
 
             Button {
@@ -193,7 +185,6 @@ private struct AbsPlanningStartView: View {
                 Label("Empezar", systemImage: "play.fill")
             }
             .buttonStyle(PrimaryButtonStyle())
-            .disabled(countdown != nil)
         }
         .padding(DS.Spacing.xl)
         .navigationTitle(planning.name)
@@ -206,23 +197,13 @@ private struct AbsPlanningStartView: View {
                     workSeconds: planning.workSeconds,
                     restSeconds: planning.restSeconds,
                     rounds: planning.rounds
-                )
+                ),
+                title: planning.name
             )
         }
-        .onDisappear { countdownTask?.cancel() }
     }
 
     private func startCountdown() {
-        countdown = 5
-        countdownTask = Task {
-            for value in stride(from: 4, through: 0, by: -1) {
-                try? await Task.sleep(for: .seconds(1))
-                guard !Task.isCancelled else { return }
-                countdown = value
-            }
-            try? await Task.sleep(for: .seconds(1))
-            guard !Task.isCancelled else { return }
-            showWorkout = true
-        }
+        showWorkout = true
     }
 }

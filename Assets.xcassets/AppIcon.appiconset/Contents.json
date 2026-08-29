@@ -19,6 +19,12 @@
       "size" : "1024x1024"
     },
     {
+      "filename" : "iOS-AppStore-1024x1024.png",
+      "idiom" : "universal",
+      "platform" : "watchos",
+      "size" : "1024x1024"
+    },
+    {
       "appearances" : [
         {
           "appearance" : "luminosity",

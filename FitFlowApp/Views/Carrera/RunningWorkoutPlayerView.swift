@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 struct RunningWorkoutPlayerView: View {
@@ -6,9 +7,12 @@ struct RunningWorkoutPlayerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var didSaveWorkout = false
     @State private var saveError: String?
+    private let liveSessionID = UUID()
+    private let watchPlan: WatchWorkoutPlan
 
     init(session: RunningSession) {
         self.session = session
+        self.watchPlan = WatchWorkoutPlan(session: session)
         _engine = StateObject(wrappedValue: IntervalTimerEngine(steps: session.phases.map(Self.step))) 
     }
 
@@ -86,7 +90,20 @@ struct RunningWorkoutPlayerView: View {
         .padding()
         .navigationTitle(session.title)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { engine.start() }
+        .onAppear {
+            PhoneWatchConnectivity.shared.onCommand = handleWatchCommand
+            engine.start()
+            publishLiveState()
+        }
+        .onReceive(engine.$remaining.throttle(for: .seconds(5), scheduler: RunLoop.main, latest: true)) { _ in
+            publishLiveState()
+        }
+        .onChange(of: engine.currentIndex) { _, _ in publishLiveState(durable: true) }
+        .onChange(of: engine.isRunning) { _, _ in publishLiveState(durable: true) }
+        .onDisappear {
+            PhoneWatchConnectivity.shared.onCommand = nil
+            PhoneWatchConnectivity.shared.endLiveSession(id: liveSessionID)
+        }
         .onChange(of: engine.isFinished) { _, isFinished in
             guard isFinished, !didSaveWorkout else { return }
             didSaveWorkout = true
@@ -109,6 +126,27 @@ struct RunningWorkoutPlayerView: View {
         } message: {
             Text(saveError ?? "Inténtalo de nuevo más tarde.")
         }
+    }
+
+    private func publishLiveState(durable: Bool = false) {
+        PhoneWatchConnectivity.shared.publish(liveState: WatchWorkoutLiveState(
+            id: liveSessionID,
+            plan: watchPlan,
+            currentStepIndex: engine.currentIndex,
+            remainingSeconds: engine.remaining,
+            elapsedSeconds: engine.totalActiveElapsed,
+            isRunning: engine.isRunning,
+            isFinished: engine.isFinished
+        ), durable: durable)
+    }
+
+    private func handleWatchCommand(_ command: WatchWorkoutCommand) {
+        guard command.sessionID == liveSessionID else { return }
+        switch command.action {
+        case .toggle: engine.toggle()
+        case .skip: engine.skip()
+        }
+        publishLiveState(durable: true)
     }
 
     private func colorFor(_ step: TimedStep) -> Color {

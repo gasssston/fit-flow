@@ -11,19 +11,56 @@
 		46531C2A303CD1E800544457 /* schema.sql in Resources */ = {isa = PBXBuildFile; fileRef = 46531C28303CD1E800544457 /* schema.sql */; };
 		46531C2B303CD1E800544457 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 46531C27303CD1E800544457 /* README.md */; };
 		46531C2E303CD30000544457 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46531C2D303CD30000544457 /* Supabase */; };
+		A10000000000000000000001 /* FitFlowWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* FitFlowWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A10000000000000000000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46531BB8303CD0CB00544457 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A10000000000000000000003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46531BA9303CD0C900544457 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000010;
+			remoteInfo = FitFlowWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A10000000000000000000004 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A10000000000000000000001 /* FitFlowWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		46531BB8303CD0CB00544457 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		46531C27303CD1E800544457 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		46531C28303CD1E800544457 /* schema.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.sql; sourceTree = "<group>"; };
 		46531CC9303CD6C600544457 /* fit-flow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fit-flow.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000002 /* FitFlowWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitFlowWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		46531C12303CD1B800544457 /* FitFlowApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = FitFlowApp;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000005 /* FitFlowShared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FitFlowShared;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000006 /* FitFlowWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FitFlowWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -37,6 +74,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A10000000000000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -44,10 +88,13 @@
 			isa = PBXGroup;
 			children = (
 				46531C12303CD1B800544457 /* FitFlowApp */,
+				A10000000000000000000005 /* FitFlowShared */,
+				A10000000000000000000006 /* FitFlowWatch */,
 				46531BB8303CD0CB00544457 /* Assets.xcassets */,
 				46531C27303CD1E800544457 /* README.md */,
 				46531C29303CD1E800544457 /* supabase */,
 				46531CC9303CD6C600544457 /* fit-flow.app */,
+				A10000000000000000000002 /* FitFlowWatch.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -69,13 +116,16 @@
 				46531BAD303CD0C900544457 /* Sources */,
 				46531BAE303CD0C900544457 /* Frameworks */,
 				46531BAF303CD0C900544457 /* Resources */,
+				A10000000000000000000004 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A10000000000000000000008 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				46531C12303CD1B800544457 /* FitFlowApp */,
+				A10000000000000000000005 /* FitFlowShared */,
 			);
 			name = "fit-flow";
 			packageProductDependencies = (
@@ -83,6 +133,29 @@
 			);
 			productName = "fit-flow";
 			productReference = 46531CC9303CD6C600544457 /* fit-flow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000010 /* FitFlowWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000011 /* Build configuration list for PBXNativeTarget "FitFlowWatch" */;
+			buildPhases = (
+				A10000000000000000000012 /* Sources */,
+				A10000000000000000000007 /* Frameworks */,
+				A10000000000000000000013 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000005 /* FitFlowShared */,
+				A10000000000000000000006 /* FitFlowWatch */,
+			);
+			name = FitFlowWatch;
+			packageProductDependencies = (
+			);
+			productName = FitFlowWatch;
+			productReference = A10000000000000000000002 /* FitFlowWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -96,6 +169,9 @@
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					46531BB0303CD0C900544457 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A10000000000000000000010 = {
 						CreatedOnToolsVersion = 26.6;
 					};
 				};
@@ -118,6 +194,7 @@
 			projectRoot = "";
 			targets = (
 				46531BB0303CD0C900544457 /* fit-flow */,
+				A10000000000000000000010 /* FitFlowWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -133,6 +210,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A10000000000000000000013 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000016 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -143,7 +228,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A10000000000000000000012 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A10000000000000000000008 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000010 /* FitFlowWatch */;
+			targetProxy = A10000000000000000000003 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		46531BBA303CD0CB00544457 /* Debug */ = {
@@ -352,6 +452,64 @@
 			};
 			name = Release;
 		};
+		A10000000000000000000014 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LDVZB3C3XD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fit Flow";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.gasty.fit-flow";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gasty.fit-flow.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Debug;
+		};
+		A10000000000000000000015 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LDVZB3C3XD;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Fit Flow";
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.gasty.fit-flow";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.gasty.fit-flow.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.5;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -369,6 +527,15 @@
 			buildConfigurations = (
 				46531BBD303CD0CB00544457 /* Debug */,
 				46531BBE303CD0CB00544457 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000011 /* Build configuration list for PBXNativeTarget "FitFlowWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000014 /* Debug */,
+				A10000000000000000000015 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

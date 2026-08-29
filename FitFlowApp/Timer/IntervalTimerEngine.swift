@@ -6,11 +6,19 @@ import Combine
 /// running timer, via `TimedStep`). Ticks every 0.1s for a smooth ring
 /// animation, beeps on every transition, and auto-advances.
 struct TimedStep: Identifiable, Equatable {
-    let id = UUID()
+    let id: UUID
     let title: String        // "RA", "Descanso", "Plancha lateral"...
     let subtitle: String?    // extra context, e.g. the exercise name
     let seconds: Int?        // nil => manual-advance / stopwatch step
     let accent: StepAccent
+
+    init(id: UUID = UUID(), title: String, subtitle: String?, seconds: Int?, accent: StepAccent) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.seconds = seconds
+        self.accent = accent
+    }
 
     enum StepAccent: String, Equatable {
         case work, rest, walk, info

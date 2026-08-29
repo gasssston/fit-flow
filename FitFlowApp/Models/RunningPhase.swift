@@ -44,8 +44,8 @@ struct RunningPhase: Identifiable, Codable, Equatable {
     var meters: Int?       // set only for .distancia
     var note: String?      // free text, set for .nota
 
-    init(kind: RunningPhaseKind, seconds: Int? = nil, meters: Int? = nil, note: String? = nil) {
-        self.id = UUID()
+    init(id: UUID = UUID(), kind: RunningPhaseKind, seconds: Int? = nil, meters: Int? = nil, note: String? = nil) {
+        self.id = id
         self.kind = kind
         self.seconds = seconds
         self.meters = meters
@@ -62,8 +62,8 @@ struct RunningSession: Identifiable, Codable {
     var rawNotation: String    // original text, kept for reference/editing
     var phases: [RunningPhase]
 
-    init(title: String, rawNotation: String, phases: [RunningPhase]) {
-        self.id = UUID()
+    init(id: UUID = UUID(), title: String, rawNotation: String, phases: [RunningPhase]) {
+        self.id = id
         self.title = title
         self.rawNotation = rawNotation
         self.phases = phases

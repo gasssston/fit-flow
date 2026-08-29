@@ -24,7 +24,10 @@ struct FitFlowApp: App {
                 }
             }
             .animation(.easeInOut(duration: 0.5), value: showSplash)
-            .task { appState.refreshFromSupabase() }
+            .task {
+                PhoneWatchConnectivity.shared.activate()
+                appState.refreshFromSupabase()
+            }
         }
     }
 }
