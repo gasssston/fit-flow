@@ -38,9 +38,10 @@ struct RingProgressView: View {
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
                     .multilineTextAlignment(.center)
-                    .lineLimit(3)
-                    .minimumScaleFactor(0.75)
-                    .frame(maxWidth: 170)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.45)
+                    .allowsTightening(true)
+                    .frame(width: 150, height: 54)
             }
         }
         .padding(24)

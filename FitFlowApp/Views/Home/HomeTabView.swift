@@ -173,15 +173,13 @@ struct HomeTabView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle()
         .fadeIn($showContent, delay: 0.4)
-        .onAppear {
-            startMotivationTimer()
-        }
-    }
-
-    private func startMotivationTimer() {
-        Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { _ in
-            withAnimation(.spring(response: 0.5)) {
-                currentExerciseIndex = (currentExerciseIndex + 1) % AbExerciseLibrary.all.count
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(5))
+                guard !Task.isCancelled else { return }
+                withAnimation(.spring(response: 0.5)) {
+                    currentExerciseIndex = (currentExerciseIndex + 1) % AbExerciseLibrary.all.count
+                }
             }
         }
     }
@@ -193,6 +191,8 @@ struct HomeTabView: View {
         do {
             stats = try await SupabaseService.shared.fetchHomeStats()
             statsError = nil
+        } catch is CancellationError {
+            return
         } catch {
             statsError = error.localizedDescription
         }

@@ -44,7 +44,7 @@
 		46531BB8303CD0CB00544457 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		46531C27303CD1E800544457 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		46531C28303CD1E800544457 /* schema.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.sql; sourceTree = "<group>"; };
-		46531CC9303CD6C600544457 /* fit-flow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fit-flow.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		46531CC9303CD6C600544457 /* FitFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000002 /* FitFlowWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitFlowWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000002 /* Models3D */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models3D; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -96,7 +96,7 @@
 				46531BB8303CD0CB00544457 /* Assets.xcassets */,
 				46531C27303CD1E800544457 /* README.md */,
 				46531C29303CD1E800544457 /* supabase */,
-				46531CC9303CD6C600544457 /* fit-flow.app */,
+				46531CC9303CD6C600544457 /* FitFlow.app */,
 				A10000000000000000000002 /* FitFlowWatch.app */,
 			);
 			sourceTree = "<group>";
@@ -112,9 +112,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		46531BB0303CD0C900544457 /* fit-flow */ = {
+		46531BB0303CD0C900544457 /* FitFlow */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 46531BBC303CD0CB00544457 /* Build configuration list for PBXNativeTarget "fit-flow" */;
+			buildConfigurationList = 46531BBC303CD0CB00544457 /* Build configuration list for PBXNativeTarget "FitFlow" */;
 			buildPhases = (
 				46531BAD303CD0C900544457 /* Sources */,
 				46531BAE303CD0C900544457 /* Frameworks */,
@@ -130,12 +130,12 @@
 				46531C12303CD1B800544457 /* FitFlowApp */,
 				A10000000000000000000005 /* FitFlowShared */,
 			);
-			name = "fit-flow";
+			name = FitFlow;
 			packageProductDependencies = (
 				46531C2D303CD30000544457 /* Supabase */,
 			);
-			productName = "fit-flow";
-			productReference = 46531CC9303CD6C600544457 /* fit-flow.app */;
+			productName = FitFlow;
+			productReference = 46531CC9303CD6C600544457 /* FitFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A10000000000000000000010 /* FitFlowWatch */ = {
@@ -196,7 +196,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				46531BB0303CD0C900544457 /* fit-flow */,
+				46531BB0303CD0C900544457 /* FitFlow */,
 				A10000000000000000000010 /* FitFlowWatch */,
 			);
 		};
@@ -526,7 +526,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		46531BBC303CD0CB00544457 /* Build configuration list for PBXNativeTarget "fit-flow" */ = {
+		46531BBC303CD0CB00544457 /* Build configuration list for PBXNativeTarget "FitFlow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				46531BBD303CD0CB00544457 /* Debug */,

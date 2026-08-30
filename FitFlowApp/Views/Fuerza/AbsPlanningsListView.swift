@@ -157,6 +157,7 @@ private struct SaveToast: Equatable {
 private struct AbsPlanningStartView: View {
     let planning: AbsPlanning
 
+    @Environment(\.dismiss) private var dismiss
     @State private var showWorkout = false
     @State private var hasStarted = false
 
@@ -204,7 +205,9 @@ private struct AbsPlanningStartView: View {
                     restSeconds: planning.restSeconds,
                     rounds: planning.rounds
                 ),
-                title: planning.name
+                title: planning.name,
+                onFinished: finishWorkout,
+                onExit: finishWorkout
             )
         }
     }
@@ -212,5 +215,13 @@ private struct AbsPlanningStartView: View {
     private func startCountdown() {
         hasStarted = true
         showWorkout = true
+    }
+
+    private func finishWorkout() {
+        showWorkout = false
+        Task { @MainActor in
+            await Task.yield()
+            dismiss()
+        }
     }
 }

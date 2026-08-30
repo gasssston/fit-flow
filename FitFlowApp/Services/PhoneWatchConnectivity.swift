@@ -43,6 +43,7 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
 
         do {
             catalogData = try encoder.encode(catalog)
+            guard canSynchronize(with: session) else { return }
             try updateApplicationContext()
         } catch {
             print("Failed to synchronize Watch catalog: \(error)")
@@ -50,6 +51,7 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     func publish(liveState: WatchWorkoutLiveState, durable: Bool = false) {
+        guard let session, canSynchronize(with: session) else { return }
         do {
             liveStateData = try encoder.encode(WatchWorkoutLiveEnvelope(state: liveState))
             sendImmediateLiveStateIfPossible()
@@ -63,6 +65,7 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     func endLiveSession(id: UUID) {
+        guard let session, canSynchronize(with: session) else { return }
         do {
             liveStateData = try encoder.encode(WatchWorkoutLiveEnvelope(state: nil))
             try updateApplicationContext()
@@ -73,7 +76,7 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     private func updateApplicationContext() throws {
-        guard let session else { return }
+        guard let session, canSynchronize(with: session) else { return }
         var context: [String: Any] = [:]
         context[WatchSyncKey.catalog] = catalogData
         context[WatchSyncKey.liveState] = liveStateData
@@ -81,7 +84,7 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     private func sendImmediateLiveStateIfPossible() {
-        guard let session, session.isReachable, let liveStateData else { return }
+        guard let session, canSynchronize(with: session), session.isReachable, let liveStateData else { return }
         pendingImmediateData = liveStateData
         guard !immediateSendInFlight else { return }
         sendNextImmediateState(using: session)
@@ -108,7 +111,15 @@ final class PhoneWatchConnectivity: NSObject, ObservableObject {
     }
 
     private func updateAvailability(_ session: WCSession) {
-        isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
+        let wasAvailable = isWatchAvailable
+        isWatchAvailable = canSynchronize(with: session)
+        if isWatchAvailable, !wasAvailable, catalogData != nil {
+            try? updateApplicationContext()
+        }
+    }
+
+    private func canSynchronize(with session: WCSession) -> Bool {
+        session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
     }
 
     private func receive(resultData: Data) {

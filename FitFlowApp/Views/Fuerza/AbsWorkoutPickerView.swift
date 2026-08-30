@@ -13,6 +13,7 @@ struct AbsWorkoutPickerView: View {
     let mode: Mode
     let onSave: (Bool) -> Void
 
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedExerciseIds: [String]
     @State private var workSeconds: Int
     @State private var restSeconds: Int
@@ -49,6 +50,12 @@ struct AbsWorkoutPickerView: View {
     var body: some View {
         VStack(spacing: 0) {
             Form {
+                if isEditingPlanning {
+                    Section("Nombre") {
+                        TextField("Nombre de la planificación", text: $planningName)
+                    }
+                }
+
                 Section("Duraciones") {
                     Stepper("Trabajo: \(workSeconds)s", value: $workSeconds, in: 5...90, step: 5)
                     Stepper("Descanso: \(restSeconds)s", value: $restSeconds, in: 5...60, step: 5)
@@ -94,21 +101,42 @@ struct AbsWorkoutPickerView: View {
             VStack(spacing: DS.Spacing.md) {
                 if isPlanningMode {
                     Button {
-                        showSaveAlert = true
+                        if isEditingPlanning {
+                            savePlanning()
+                        } else {
+                            showSaveAlert = true
+                        }
                     } label: {
-                        Label("Guardar planificación", systemImage: "square.and.arrow.down")
+                        if isSaving {
+                            HStack(spacing: DS.Spacing.sm) {
+                                ProgressView()
+                                    .tint(.white)
+                                Text("Guardando...")
+                            }
+                        } else {
+                            Label(
+                                isEditingPlanning ? "Guardar cambios" : "Guardar planificación",
+                                systemImage: "square.and.arrow.down"
+                            )
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(
+                        selectedExerciseIds.isEmpty
+                            || isSaving
+                            || (isEditingPlanning && planningName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    )
+                }
+
+                if !isPlanningMode {
+                    Button {
+                        showPlayer = true
+                    } label: {
+                        Label("Empezar circuito", systemImage: "play.fill")
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .disabled(selectedExerciseIds.isEmpty || isSaving)
                 }
-
-                Button {
-                    showPlayer = true
-                } label: {
-                    Label(isPlanningMode ? "Vista previa" : "Empezar circuito", systemImage: "play.fill")
-                }
-                .buttonStyle(PrimaryButtonStyle(tint: isPlanningMode ? .gray : .accentColor))
-                .disabled(selectedExerciseIds.isEmpty)
             }
             .padding(DS.Spacing.lg)
             .background(.ultraThinMaterial)
@@ -120,13 +148,18 @@ struct AbsWorkoutPickerView: View {
             }
         }
         .navigationDestination(isPresented: $showPlayer) {
-            AbsWorkoutPlayerView(steps: buildSteps(), configuration: workoutConfiguration)
+            AbsWorkoutPlayerView(
+                steps: buildSteps(),
+                configuration: workoutConfiguration,
+                onExit: exitToAbs
+            )
         }
         .alert("Nombre de la planificación", isPresented: $showSaveAlert) {
             TextField("Ej: Rutina diaria", text: $planningName)
             Button("Guardar") {
                 savePlanning()
             }
+            .disabled(planningName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("Cancelar", role: .cancel) {}
         } message: {
             Text("Dale un nombre a tu circuito para poder reutilizarlo.")
@@ -163,11 +196,16 @@ struct AbsWorkoutPickerView: View {
         return true
     }
 
+    private var isEditingPlanning: Bool {
+        if case .editPlanning = mode { return true }
+        return false
+    }
+
     private var navigationTitle: String {
         switch mode {
         case .oneByOne: "Abdominales"
         case .createPlanning: "Nueva planificación"
-        case .editPlanning: "Editar planificación"
+        case .editPlanning: planningName
         }
     }
 
@@ -218,6 +256,14 @@ struct AbsWorkoutPickerView: View {
                 onSave(false)
             }
             isSaving = false
+        }
+    }
+
+    private func exitToAbs() {
+        showPlayer = false
+        Task { @MainActor in
+            await Task.yield()
+            dismiss()
         }
     }
 }

@@ -5,6 +5,8 @@ struct AbsWorkoutPlayerView: View {
     @StateObject private var engine: IntervalTimerEngine
     @Environment(\.dismiss) private var dismiss
     private let configuration: AbWorkoutConfiguration
+    private let onFinished: (() -> Void)?
+    private let onExit: (() -> Void)?
     private let liveSessionID = UUID()
     private let watchPlan: WatchWorkoutPlan
     @State private var didSaveWorkout = false
@@ -12,8 +14,16 @@ struct AbsWorkoutPlayerView: View {
     @State private var preparationRemaining = 5
     @State private var preparationTask: Task<Void, Never>?
 
-    init(steps: [TimedStep], configuration: AbWorkoutConfiguration, title: String = "Circuito abdominales") {
+    init(
+        steps: [TimedStep],
+        configuration: AbWorkoutConfiguration,
+        title: String = "Circuito abdominales",
+        onFinished: (() -> Void)? = nil,
+        onExit: (() -> Void)? = nil
+    ) {
         self.configuration = configuration
+        self.onFinished = onFinished
+        self.onExit = onExit
         self.watchPlan = WatchWorkoutPlan(
             id: UUID(),
             title: title,
@@ -40,7 +50,7 @@ struct AbsWorkoutPlayerView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if engine.isFinished {
-                CompletionView { dismiss() }
+                CompletionView { onFinished?() ?? dismiss() }
             } else if let step = engine.currentStep {
                 let accentColor = PhaseColor.color(for: step.accent)
 
@@ -49,7 +59,7 @@ struct AbsWorkoutPlayerView: View {
 
                 if let animId = step.subtitle {
                     ExerciseVisualizerView(animation: StickmanPoseLibrary.animation(for: animId), strokeColor: .primary, jointColor: accentColor)
-                        .frame(maxHeight: 220)
+                        .frame(maxWidth: .infinity, maxHeight: 220)
                         .padding(.top, DS.Spacing.xs)
                 } else {
                     Image(systemName: "figure.cooldown")
@@ -78,10 +88,23 @@ struct AbsWorkoutPlayerView: View {
                 controls
             }
         }
-        .padding()
+        .padding(engine.isFinished ? 0 : DS.Spacing.lg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            LinearGradient(colors: [(engine.currentStep.map { PhaseColor.color(for: $0.accent) } ?? .accentColor).opacity(0.12), .clear],
-                            startPoint: .top, endPoint: .bottom)
+            ZStack {
+                DS.Colors.darkBG
+                if !engine.isFinished {
+                    RadialGradient(
+                        colors: [
+                            (engine.currentStep.map { PhaseColor.color(for: $0.accent) } ?? .accentColor).opacity(0.2),
+                            .clear
+                        ],
+                        center: .top,
+                        startRadius: 20,
+                        endRadius: 430
+                    )
+                }
+            }
             .ignoresSafeArea()
         )
         .navigationTitle("Circuito de abdominales")
@@ -122,6 +145,7 @@ struct AbsWorkoutPlayerView: View {
         } message: {
             Text(saveError ?? "Inténtalo de nuevo más tarde.")
         }
+        .navigationBarBackButtonHidden(true)
     }
 
     private func startPreparation() {
@@ -176,6 +200,15 @@ struct AbsWorkoutPlayerView: View {
                 font: .title2,
                 action: { engine.skip() }
             )
+            if !engine.isRunning {
+                PlayerControlButton(
+                    systemName: "xmark",
+                    size: 52,
+                    font: .title2,
+                    action: { onExit?() ?? dismiss() }
+                )
+                .accessibilityLabel("Salir del entrenamiento")
+            }
         }
         .padding(.bottom, DS.Spacing.md)
     }
@@ -185,6 +218,7 @@ struct CompletionView: View {
     let onDone: () -> Void
 
     @State private var isVisible = false
+    @State private var ringsAreMoving = false
 
     var body: some View {
         ZStack {
@@ -199,9 +233,18 @@ struct CompletionView: View {
 
             ForEach(0..<3, id: \.self) { index in
                 Circle()
-                    .stroke(LinearGradient.brandGradient.opacity(0.22 - Double(index) * 0.05), lineWidth: 1)
+                    .trim(from: index == 1 ? 0.08 : 0, to: index == 1 ? 0.88 : 1)
+                    .stroke(
+                        LinearGradient.brandGradient.opacity(0.28 - Double(index) * 0.05),
+                        style: StrokeStyle(
+                            lineWidth: index == 0 ? 2 : 1,
+                            lineCap: .round,
+                            dash: index == 2 ? [8, 12] : []
+                        )
+                    )
                     .frame(width: CGFloat(170 + index * 70))
-                    .scaleEffect(isVisible ? 1 : 0.7)
+                    .scaleEffect(ringsAreMoving ? 1.04 : 0.96)
+                    .rotationEffect(.degrees(ringsAreMoving ? Double(index.isMultiple(of: 2) ? 18 : -18) : 0))
                     .opacity(isVisible ? 1 : 0)
             }
 
@@ -212,6 +255,8 @@ struct CompletionView: View {
                     .frame(width: 104, height: 104)
                     .background(.white.opacity(0.06), in: Circle())
                     .overlay(Circle().stroke(.white.opacity(0.12)))
+                    .shadow(color: DS.Colors.brandMid.opacity(0.55), radius: ringsAreMoving ? 24 : 10)
+                    .zIndex(2)
 
                 Text("Circuito completado")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
@@ -229,9 +274,14 @@ struct CompletionView: View {
             .offset(y: isVisible ? 0 : 18)
         }
         .preferredColorScheme(.dark)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea(edges: .bottom)
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.78)) {
                 isVisible = true
+            }
+            withAnimation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true)) {
+                ringsAreMoving = true
             }
         }
     }

@@ -20,7 +20,8 @@ struct StickmanView: View {
     }
 
     private func draw(pose: StickmanPose, in context: inout GraphicsContext, size: CGSize) {
-        let box = min(size.width, size.height)
+        // Keep extreme poses and the head inside the canvas instead of clipping at its edges.
+        let box = min(size.width, size.height) * 0.84
         let origin = CGPoint(x: (size.width - box) / 2, y: (size.height - box) / 2)
         func p(_ point: CGPoint) -> CGPoint {
             CGPoint(x: origin.x + point.x * box, y: origin.y + point.y * box)

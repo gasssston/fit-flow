@@ -131,6 +131,7 @@ struct CardStyle: ViewModifier {
 
 struct PrimaryButtonStyle: ButtonStyle {
     var tint: Color = .accentColor
+    @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -138,7 +139,12 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(DS.Spacing.md)
-            .background(tint, in: RoundedRectangle(cornerRadius: DS.Radius.sm))
+            .background(isEnabled ? tint : DS.Colors.surface, in: RoundedRectangle(cornerRadius: DS.Radius.sm))
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.Radius.sm)
+                    .stroke(isEnabled ? .clear : DS.Colors.hairline)
+            )
+            .opacity(isEnabled ? 1 : 0.48)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }
