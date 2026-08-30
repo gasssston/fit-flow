@@ -13,7 +13,7 @@ struct AbsWorkoutPickerView: View {
     let mode: Mode
     let onSave: (Bool) -> Void
 
-    @State private var selected: Set<String>
+    @State private var selectedExerciseIds: [String]
     @State private var workSeconds: Int
     @State private var restSeconds: Int
     @State private var rounds: Int
@@ -21,19 +21,25 @@ struct AbsWorkoutPickerView: View {
     @State private var planningName = ""
     @State private var showSaveAlert = false
     @State private var isSaving = false
+    @State private var previewExercise: AbExercise?
 
     init(mode: Mode = .oneByOne, onSave: @escaping (Bool) -> Void = { _ in }) {
         self.mode = mode
         self.onSave = onSave
 
         if case let .editPlanning(planning) = mode {
-            _selected = State(initialValue: Set(planning.exerciseIds))
+            _selectedExerciseIds = State(initialValue: planning.exerciseIds)
             _workSeconds = State(initialValue: planning.workSeconds)
             _restSeconds = State(initialValue: planning.restSeconds)
             _rounds = State(initialValue: planning.rounds)
             _planningName = State(initialValue: planning.name)
+        } else if case .oneByOne = mode {
+            _selectedExerciseIds = State(initialValue: AbExerciseLibrary.all.map(\.id))
+            _workSeconds = State(initialValue: 20)
+            _restSeconds = State(initialValue: 10)
+            _rounds = State(initialValue: 1)
         } else {
-            _selected = State(initialValue: Set(AbExerciseLibrary.all.map(\.id)))
+            _selectedExerciseIds = State(initialValue: [])
             _workSeconds = State(initialValue: 20)
             _restSeconds = State(initialValue: 10)
             _rounds = State(initialValue: 1)
@@ -49,17 +55,41 @@ struct AbsWorkoutPickerView: View {
                     Stepper("Rondas: \(rounds)", value: $rounds, in: 1...5)
                 }
 
-                Section("Ejercicios") {
-                    ForEach(AbExerciseLibrary.all) { exercise in
+                if !selectedExercises.isEmpty {
+                    Section("Orden del circuito") {
+                        ForEach(selectedExercises) { exercise in
+                            Button {
+                                toggle(exercise.id)
+                            } label: {
+                                ExerciseRow(exercise: exercise, isSelected: true, showsReorderHint: true)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .onMove(perform: moveExercises)
+                    }
+                }
+
+                Section(selectedExercises.isEmpty ? "Elige ejercicios" : "Añadir ejercicios") {
+                    ForEach(unselectedExercises) { exercise in
                         Button {
                             toggle(exercise.id)
                         } label: {
-                            ExerciseRow(exercise: exercise, isSelected: selected.contains(exercise.id))
+                            ExerciseRow(exercise: exercise, isSelected: false)
                         }
                         .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button {
+                                previewExercise = exercise
+                            } label: {
+                                Label("Ver en 3D", systemImage: "eye.fill")
+                            }
+                            .tint(DS.Colors.info)
+                        }
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.Colors.canvas)
 
             VStack(spacing: DS.Spacing.md) {
                 if isPlanningMode {
@@ -69,7 +99,7 @@ struct AbsWorkoutPickerView: View {
                         Label("Guardar planificación", systemImage: "square.and.arrow.down")
                     }
                     .buttonStyle(PrimaryButtonStyle())
-                    .disabled(selected.isEmpty || isSaving)
+                    .disabled(selectedExerciseIds.isEmpty || isSaving)
                 }
 
                 Button {
@@ -78,12 +108,17 @@ struct AbsWorkoutPickerView: View {
                     Label(isPlanningMode ? "Vista previa" : "Empezar circuito", systemImage: "play.fill")
                 }
                 .buttonStyle(PrimaryButtonStyle(tint: isPlanningMode ? .gray : .accentColor))
-                .disabled(selected.isEmpty)
+                .disabled(selectedExerciseIds.isEmpty)
             }
             .padding(DS.Spacing.lg)
             .background(.ultraThinMaterial)
         }
         .navigationTitle(navigationTitle)
+        .toolbar {
+            if selectedExerciseIds.count > 1 {
+                EditButton()
+            }
+        }
         .navigationDestination(isPresented: $showPlayer) {
             AbsWorkoutPlayerView(steps: buildSteps(), configuration: workoutConfiguration)
         }
@@ -96,10 +131,31 @@ struct AbsWorkoutPickerView: View {
         } message: {
             Text("Dale un nombre a tu circuito para poder reutilizarlo.")
         }
+        .sheet(item: $previewExercise) { exercise in
+            Exercise3DPreviewView(exercise: exercise)
+        }
     }
 
     private func toggle(_ id: String) {
-        if selected.contains(id) { selected.remove(id) } else { selected.insert(id) }
+        if let index = selectedExerciseIds.firstIndex(of: id) {
+            selectedExerciseIds.remove(at: index)
+        } else {
+            selectedExerciseIds.append(id)
+        }
+    }
+
+    private func moveExercises(from source: IndexSet, to destination: Int) {
+        selectedExerciseIds.move(fromOffsets: source, toOffset: destination)
+    }
+
+    private var selectedExercises: [AbExercise] {
+        selectedExerciseIds.compactMap { id in
+            AbExerciseLibrary.all.first { $0.id == id }
+        }
+    }
+
+    private var unselectedExercises: [AbExercise] {
+        AbExerciseLibrary.all.filter { !selectedExerciseIds.contains($0.id) }
     }
 
     private var isPlanningMode: Bool {
@@ -116,7 +172,7 @@ struct AbsWorkoutPickerView: View {
     }
 
     private func buildSteps() -> [TimedStep] {
-        let exercises = AbExerciseLibrary.all.filter { selected.contains($0.id) }
+        let exercises = selectedExercises
         var steps: [TimedStep] = []
         for _ in 0..<rounds {
             for (index, exercise) in exercises.enumerated() {
@@ -132,7 +188,7 @@ struct AbsWorkoutPickerView: View {
 
     private var workoutConfiguration: AbWorkoutConfiguration {
         AbWorkoutConfiguration(
-            exerciseIds: Array(selected).sorted(),
+            exerciseIds: selectedExerciseIds,
             workSeconds: workSeconds,
             restSeconds: restSeconds,
             rounds: rounds
@@ -149,7 +205,7 @@ struct AbsWorkoutPickerView: View {
                 id: existingPlanning?.id ?? UUID(),
                 userId: existingPlanning?.userId ?? SupabaseService.shared.currentUserID,
                 name: name,
-                exerciseIds: Array(selected).sorted(),
+                exerciseIds: selectedExerciseIds,
                 workSeconds: workSeconds,
                 restSeconds: restSeconds,
                 rounds: rounds
@@ -171,15 +227,55 @@ struct AbsWorkoutPickerView: View {
 private struct ExerciseRow: View {
     let exercise: AbExercise
     let isSelected: Bool
+    var showsReorderHint = false
 
     var body: some View {
         HStack {
-            StickmanView(animation: StickmanPoseLibrary.animation(for: exercise.id))
+            ExerciseVisualizerView(
+                animation: StickmanPoseLibrary.animation(for: exercise.id),
+                strokeColor: DS.Colors.brandMid,
+                jointColor: DS.Colors.brandStart
+            )
                 .frame(width: DS.IconSize.exerciseThumb, height: DS.IconSize.exerciseThumb)
             Text(exercise.name)
             Spacer()
-            Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+            Image(systemName: showsReorderHint ? "line.3.horizontal" : (isSelected ? "checkmark.circle.fill" : "plus.circle"))
                 .foregroundStyle(isSelected ? DS.Colors.brandMid : .secondary)
         }
+    }
+}
+
+private struct Exercise3DPreviewView: View {
+    let exercise: AbExercise
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            Model3DView(animation: StickmanPoseLibrary.animation(for: exercise.id))
+                .padding(.bottom, 80)
+                .background(
+                    LinearGradient(
+                        colors: [DS.Colors.brandStart.opacity(0.12), .clear],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .overlay(alignment: .bottom) {
+                    Label("Arrastra para girar · Pellizca para ampliar", systemImage: "hand.draw")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding()
+                }
+                .navigationTitle(exercise.name)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Cerrar") { dismiss() }
+                    }
+                }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }

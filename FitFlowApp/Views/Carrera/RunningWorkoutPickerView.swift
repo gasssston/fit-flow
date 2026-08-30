@@ -55,6 +55,8 @@ struct RunningWorkoutPickerView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.Colors.canvas)
             .navigationTitle("Carrera")
             .navigationDestination(isPresented: $showCustomPlayer) {
                 if let session = selectedSession {

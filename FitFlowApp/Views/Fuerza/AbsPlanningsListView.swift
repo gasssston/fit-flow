@@ -61,6 +61,8 @@ struct AbsPlanningsListView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(DS.Colors.canvas)
         .navigationTitle("Abdominales")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -156,6 +158,7 @@ private struct AbsPlanningStartView: View {
     let planning: AbsPlanning
 
     @State private var showWorkout = false
+    @State private var hasStarted = false
 
     var body: some View {
         VStack(spacing: DS.Spacing.xl) {
@@ -179,14 +182,17 @@ private struct AbsPlanningStartView: View {
 
             Spacer()
 
-            Button {
-                startCountdown()
-            } label: {
-                Label("Empezar", systemImage: "play.fill")
+            if !hasStarted {
+                Button {
+                    startCountdown()
+                } label: {
+                    Label("Empezar", systemImage: "play.fill")
+                }
+                .buttonStyle(PrimaryButtonStyle())
             }
-            .buttonStyle(PrimaryButtonStyle())
         }
         .padding(DS.Spacing.xl)
+        .background(DS.Colors.canvas.ignoresSafeArea())
         .navigationTitle(planning.name)
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showWorkout) {
@@ -204,6 +210,7 @@ private struct AbsPlanningStartView: View {
     }
 
     private func startCountdown() {
+        hasStarted = true
         showWorkout = true
     }
 }

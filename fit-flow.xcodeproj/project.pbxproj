@@ -13,6 +13,7 @@
 		46531C2E303CD30000544457 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 46531C2D303CD30000544457 /* Supabase */; };
 		A10000000000000000000001 /* FitFlowWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* FitFlowWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A10000000000000000000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 46531BB8303CD0CB00544457 /* Assets.xcassets */; };
+		B20000000000000000000001 /* Models3D in Resources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* Models3D */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		46531C28303CD1E800544457 /* schema.sql */ = {isa = PBXFileReference; lastKnownFileType = text; path = schema.sql; sourceTree = "<group>"; };
 		46531CC9303CD6C600544457 /* fit-flow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "fit-flow.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000002 /* FitFlowWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitFlowWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000002 /* Models3D */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models3D; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -90,6 +92,7 @@
 				46531C12303CD1B800544457 /* FitFlowApp */,
 				A10000000000000000000005 /* FitFlowShared */,
 				A10000000000000000000006 /* FitFlowWatch */,
+				B20000000000000000000002 /* Models3D */,
 				46531BB8303CD0CB00544457 /* Assets.xcassets */,
 				46531C27303CD1E800544457 /* README.md */,
 				46531C29303CD1E800544457 /* supabase */,
@@ -205,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				46531BB9303CD0CB00544457 /* Assets.xcassets in Resources */,
+				B20000000000000000000001 /* Models3D in Resources */,
 				46531C2A303CD1E800544457 /* schema.sql in Resources */,
 				46531C2B303CD1E800544457 /* README.md in Resources */,
 			);

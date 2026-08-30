@@ -99,7 +99,7 @@ struct WatchMirroredWorkoutView: View {
     @ViewBuilder
     private func stepVisual(_ step: WatchWorkoutStep) -> some View {
         if step.style == .work, let animationID = step.detail {
-            StickmanView(
+            ExerciseVisualizerView(
                 animation: StickmanPoseLibrary.animation(for: animationID),
                 strokeColor: .white,
                 jointColor: color(for: step.style)

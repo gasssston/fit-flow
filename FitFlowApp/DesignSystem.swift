@@ -17,6 +17,9 @@ enum DS {
 
         /// Dark background used on Auth + Splash screens.
         static let darkBG = Color(red: 0.07, green: 0.07, blue: 0.09)
+        static let canvas = Color(red: 0.035, green: 0.04, blue: 0.045)
+        static let surface = Color(red: 0.075, green: 0.085, blue: 0.09)
+        static let hairline = Color.white.opacity(0.11)
 
         /// Semantic phase colors (shared by abs + running timers).
         static let work  = Color.red
@@ -114,8 +117,15 @@ struct BrandCircleBorder: ViewModifier {
 struct CardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .padding()
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.lg))
+            .padding(DS.Spacing.lg)
+            .background(DS.Colors.surface, in: RoundedRectangle(cornerRadius: DS.Radius.sm))
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(LinearGradient.brandGradient)
+                    .frame(width: 3)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: DS.Radius.sm))
+            .overlay(RoundedRectangle(cornerRadius: DS.Radius.sm).stroke(DS.Colors.hairline))
     }
 }
 
@@ -128,7 +138,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .padding(DS.Spacing.md)
-            .background(tint, in: RoundedRectangle(cornerRadius: DS.Radius.md))
+            .background(tint, in: RoundedRectangle(cornerRadius: DS.Radius.sm))
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
     }

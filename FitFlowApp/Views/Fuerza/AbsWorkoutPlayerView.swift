@@ -48,7 +48,7 @@ struct AbsWorkoutPlayerView: View {
                     .font(.subheadline).foregroundStyle(.secondary)
 
                 if let animId = step.subtitle {
-                    StickmanView(animation: StickmanPoseLibrary.animation(for: animId), strokeColor: .primary, jointColor: accentColor)
+                    ExerciseVisualizerView(animation: StickmanPoseLibrary.animation(for: animId), strokeColor: .primary, jointColor: accentColor)
                         .frame(maxHeight: 220)
                         .padding(.top, DS.Spacing.xs)
                 } else {
@@ -183,18 +183,56 @@ struct AbsWorkoutPlayerView: View {
 
 struct CompletionView: View {
     let onDone: () -> Void
+
+    @State private var isVisible = false
+
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "flame.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(.orange)
-            Text("¡Circuito completado!")
-                .font(.title.bold())
-            Text("Buen trabajo. A por el siguiente.")
-                .foregroundStyle(.secondary)
-            Button("Volver", action: onDone)
-                .buttonStyle(.borderedProminent)
+        ZStack {
+            DS.Colors.darkBG
+                .ignoresSafeArea()
+
+            Circle()
+                .fill(DS.Colors.brandMid.opacity(0.2))
+                .frame(width: 320, height: 320)
+                .blur(radius: 55)
+                .scaleEffect(isVisible ? 1 : 0.55)
+
+            ForEach(0..<3, id: \.self) { index in
+                Circle()
+                    .stroke(LinearGradient.brandGradient.opacity(0.22 - Double(index) * 0.05), lineWidth: 1)
+                    .frame(width: CGFloat(170 + index * 70))
+                    .scaleEffect(isVisible ? 1 : 0.7)
+                    .opacity(isVisible ? 1 : 0)
+            }
+
+            VStack(spacing: DS.Spacing.lg) {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 44, weight: .bold))
+                    .foregroundStyle(LinearGradient.brandGradient)
+                    .frame(width: 104, height: 104)
+                    .background(.white.opacity(0.06), in: Circle())
+                    .overlay(Circle().stroke(.white.opacity(0.12)))
+
+                Text("Circuito completado")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text("Has cumplido contigo hoy.")
+                    .foregroundStyle(.white.opacity(0.58))
+
+                Button("Volver", action: onDone)
+                    .buttonStyle(PrimaryButtonStyle(tint: DS.Colors.brandEnd))
+                    .padding(.top, DS.Spacing.lg)
+            }
+            .padding(DS.Spacing.xxl)
+            .opacity(isVisible ? 1 : 0)
+            .offset(y: isVisible ? 0 : 18)
         }
-        .padding()
+        .preferredColorScheme(.dark)
+        .onAppear {
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.78)) {
+                isVisible = true
+            }
+        }
     }
 }

@@ -63,6 +63,6 @@ struct StickmanView: View {
 }
 
 #Preview {
-    StickmanView(animation: StickmanPoseLibrary.commandoPlank)
+    ExerciseVisualizerView(animation: StickmanPoseLibrary.commandoPlank)
         .padding()
 }

@@ -1,0 +1,31 @@
+enum Model3DAnimationCatalog {
+    static let filenamesByExerciseID: [String: String] = [
+        "plank": "plank",
+        "plankKnees": "plankKnees",
+        "highPlank": "highPlank",
+        "sidePlankLeft": "sidePlankLeft",
+        "sidePlankRight": "sidePlankRight",
+        "commandoPlank": "commandoPlank",
+        "plankLegRaise": "plankLegRaise",
+        "spidermanPlank": "spidermanPlank",
+        "supermanPlank": "supermanPlank",
+        "mountainClimbers": "mountainClimbers",
+        "legRaise": "legRaise",
+        "jackknife": "jackknife",
+        "legCircles": "legCircles",
+        "legRaiseAlternating": "legRaiseAlternating",
+        "alternatingKneeTucks": "alternatingKneeTucks",
+        "legScissors": "legScissors",
+        "windshieldWipers": "windshieldWipers",
+        "crunch": "crunch",
+        "bicycleCrunch": "bicycleCrunch",
+        "heelTouches": "heelTouches",
+        "vTwist": "vTwist",
+        "hollowHold": "hollowHold",
+        "flatExtendedHold": "flatExtendedHold",
+        "vUp": "vUp",
+        "supportedKneeTuck": "supportedKneeTuck",
+        "butterflySitUp": "butterflySitUp",
+        "crossToeTouch": "crossToeTouch"
+    ]
+}

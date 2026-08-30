@@ -3,7 +3,6 @@ import SwiftUI
 struct HomeTabView: View {
     @EnvironmentObject private var appState: AppState
     @State private var currentExerciseIndex = 0
-    @State private var animateGradient = false
     @State private var showContent = false
     @State private var stats = HomeStats()
     @State private var isLoadingStats = true
@@ -20,21 +19,15 @@ struct HomeTabView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                LinearGradient(
-                    colors: [
-                        animateGradient ? .blue.opacity(0.15) : .purple.opacity(0.15),
-                        animateGradient ? .purple.opacity(0.1) : .blue.opacity(0.1),
-                        .clear
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-                .onAppear {
-                    withAnimation(.easeInOut(duration: 4.0).repeatForever(autoreverses: true)) {
-                        animateGradient.toggle()
+                DS.Colors.canvas
+                    .overlay(alignment: .topTrailing) {
+                        Circle()
+                            .fill(DS.Colors.brandMid.opacity(0.16))
+                            .frame(width: 280)
+                            .blur(radius: 80)
+                            .offset(x: 110, y: -90)
                     }
-                }
+                .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: DS.Spacing.xl) {
@@ -47,7 +40,7 @@ struct HomeTabView: View {
                 }
                 .refreshable { await loadStats() }
             }
-            .navigationTitle("FitFlow")
+            .toolbar(.hidden, for: .navigationBar)
             .onAppear {
                 withAnimation(.easeOut(duration: 0.6)) {
                     showContent = true
@@ -68,10 +61,16 @@ struct HomeTabView: View {
 
     private var headerSection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            Text(greeting)
-                .font(.title2.bold())
-            Text("¿Qué vas a entrenar hoy?")
-                .font(.subheadline)
+            Text("FITFLOW / HOY")
+                .font(.caption.bold())
+                .tracking(2.4)
+                .foregroundStyle(DS.Colors.brandMid)
+            Text(greeting.uppercased())
+                .font(.system(size: 40, weight: .black, design: .rounded))
+                .minimumScaleFactor(0.75)
+            Text("¿QUÉ VAS A ENTRENAR?")
+                .font(.caption.weight(.semibold))
+                .tracking(1.6)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,28 +80,29 @@ struct HomeTabView: View {
     private var greeting: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 6..<12: return "Buenos días ☀️"
-        case 12..<18: return "Buenas tardes 🌤"
-        default: return "Buenas noches 🌙"
+        case 6..<12: return "Buenos días"
+        case 12..<18: return "Buenas tardes"
+        default: return "Buenas noches"
         }
     }
 
     private var featuredWorkoutCard: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.md) {
             HStack {
-                Image(systemName: "flame.fill")
-                    .font(.title2)
-                    .foregroundStyle(.orange)
-                Text("Circuito de Abdominales")
-                    .font(.headline)
+                Text("01")
+                    .font(.caption.monospaced().bold())
+                    .foregroundStyle(DS.Colors.brandMid)
+                Text("CORE EXPRESS")
+                    .font(.headline.weight(.black))
+                    .tracking(0.8)
                 Spacer()
                 Image(systemName: "chevron.right")
                     .foregroundStyle(.secondary)
             }
 
-            Text("7 minutos para activar tu core")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text("7 minutos para\nactivar tu core")
+                .font(.system(size: 30, weight: .bold, design: .rounded))
+                .fixedSize(horizontal: false, vertical: true)
 
             HStack(spacing: DS.Spacing.md) {
                 Label("7 min", systemImage: "clock")
@@ -123,10 +123,10 @@ struct HomeTabView: View {
             ForEach(0..<AbExerciseLibrary.all.count, id: \.self) { index in
                 let exercise = AbExerciseLibrary.all[index]
                 HStack(spacing: DS.Spacing.md) {
-                    StickmanView(
+                    ExerciseVisualizerView(
                         animation: StickmanPoseLibrary.animation(for: exercise.id),
                         strokeColor: .primary,
-                        jointColor: .orange
+                        jointColor: DS.Colors.brandMid
                     )
                     .frame(width: 60, height: 60)
 
@@ -148,9 +148,9 @@ struct HomeTabView: View {
 
     private var quickStatsSection: some View {
         HStack(spacing: DS.Spacing.md) {
-            StatCard(icon: "flame.fill", title: "Racha", value: isLoadingStats ? "--" : "\(stats.streakDays) días", color: .orange)
-            StatCard(icon: "figure.run", title: "Carreras", value: isLoadingStats ? "--" : "\(stats.runningWorkouts)", color: .blue)
-            StatCard(icon: "clock.fill", title: "Tiempo", value: isLoadingStats ? "--" : stats.formattedTime, color: .green)
+            StatCard(icon: "bolt.fill", title: "Racha", value: isLoadingStats ? "--" : "\(stats.streakDays) días", color: DS.Colors.brandMid)
+            StatCard(icon: "figure.run", title: "Carreras", value: isLoadingStats ? "--" : "\(stats.runningWorkouts)", color: .white)
+            StatCard(icon: "clock.fill", title: "Tiempo", value: isLoadingStats ? "--" : stats.formattedTime, color: DS.Colors.brandMid)
         }
         .fadeIn($showContent, delay: 0.3)
     }
@@ -158,9 +158,11 @@ struct HomeTabView: View {
     private var motivationalSection: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             Text("Motivación del día")
-                .font(.headline)
+                .font(.caption.bold())
+                .tracking(1.8)
+                .foregroundStyle(DS.Colors.brandMid)
             Text(motivationalPhrases[currentExerciseIndex % motivationalPhrases.count])
-                .font(.title3.bold())
+                .font(.system(size: 28, weight: .black, design: .rounded))
                 .foregroundStyle(.primary)
                 .id(currentExerciseIndex)
                 .transition(.asymmetric(
@@ -216,6 +218,7 @@ struct StatCard: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, DS.Spacing.lg)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: DS.Radius.md))
+        .background(DS.Colors.surface, in: RoundedRectangle(cornerRadius: DS.Radius.sm))
+        .overlay(RoundedRectangle(cornerRadius: DS.Radius.sm).stroke(DS.Colors.hairline))
     }
 }

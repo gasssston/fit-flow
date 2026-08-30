@@ -36,5 +36,9 @@ struct HomeView: View {
                 }
                 .tag(3)
         }
+        .tint(DS.Colors.brandMid)
+        .preferredColorScheme(.dark)
+        .toolbarBackground(DS.Colors.canvas.opacity(0.96), for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }
