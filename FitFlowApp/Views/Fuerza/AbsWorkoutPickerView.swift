@@ -71,6 +71,14 @@ struct AbsWorkoutPickerView: View {
                                 ExerciseRow(exercise: exercise, isSelected: true, showsReorderHint: true)
                             }
                             .buttonStyle(.plain)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    previewExercise = exercise
+                                } label: {
+                                    Label("Ver en 3D", systemImage: "eye.fill")
+                                }
+                                .tint(DS.Colors.info)
+                            }
                         }
                         .onMove(perform: moveExercises)
                     }
