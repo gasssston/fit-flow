@@ -98,7 +98,7 @@ struct AbsPlanningsListView: View {
                     .padding(.horizontal, DS.Spacing.lg)
                     .padding(.vertical, DS.Spacing.md)
                     .background(toast.isError ? Color.red : DS.Colors.brandEnd, in: Capsule())
-                    .padding(.top, DS.Spacing.sm)
+                    .offset(y: -DS.Spacing.xl)
                     .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
