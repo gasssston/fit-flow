@@ -140,6 +140,9 @@ struct Model3DView: UIViewRepresentable {
             cameraNode.simdLocalRotate(
                 by: simd_quatf(angle: -.pi / 2, axis: SIMD3(0, 0, 1))
             )
+            // Keep every exercise centered in the preview's upper display area,
+            // leaving the bottom clear for the interaction hint.
+            cameraNode.simdLocalTranslate(by: SIMD3(0, -0.7, 0))
             scene.rootNode.addChildNode(cameraNode)
             return cameraNode
         }

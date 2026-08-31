@@ -307,7 +307,6 @@ private struct Exercise3DPreviewView: View {
     var body: some View {
         NavigationStack {
             Model3DView(animation: StickmanPoseLibrary.animation(for: exercise.id))
-                .padding(.bottom, 80)
                 .background(
                     LinearGradient(
                         colors: [DS.Colors.brandStart.opacity(0.12), .clear],
