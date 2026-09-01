@@ -98,25 +98,9 @@ struct AuthView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 60, height: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .shadow(color: Color(red: 0, green: 0.8, blue: 0.6).opacity(0.4), radius: 12, y: 4)
                         .scaleEffect(logoScale)
                         .opacity(logoOpacity)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(
-                                    LinearGradient(
-                                        colors: [
-                                            Color(red: 0, green: 0.85, blue: 0.65).opacity(0.7),
-                                            Color(red: 0, green: 0.7, blue: 0.5).opacity(0.15)
-                                        ],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1.5
-                                )
-                                .opacity(logoOpacity * 0.5)
-                        )
 
                     // Title
                     Text("FitFlow")

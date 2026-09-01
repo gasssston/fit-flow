@@ -48,25 +48,9 @@ struct SplashView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 160, height: 160)
-                    .clipShape(RoundedRectangle(cornerRadius: 36, style: .continuous))
-                    .shadow(color: .black.opacity(0.4), radius: 20, y: 10)
+                    .shadow(color: Color(red: 0.2, green: 0.88, blue: 0.69).opacity(0.3), radius: 24)
                     .scaleEffect(logoScale)
                     .opacity(logoOpacity)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 36, style: .continuous)
-                            .stroke(
-                                LinearGradient(
-                                    colors: [
-                                        Color(red: 0, green: 0.85, blue: 0.65).opacity(0.8),
-                                        Color(red: 0, green: 0.7, blue: 0.5).opacity(0.2)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                            .opacity(logoOpacity * 0.6)
-                    )
 
                 // App name
                 Text("FitFlow")

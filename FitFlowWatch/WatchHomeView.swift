@@ -25,8 +25,7 @@ struct WatchHomeView: View {
                     Image("Logo")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .clipShape(Circle())
+                        .frame(width: 26, height: 26)
                 }
             }
             .navigationDestination(for: WatchWorkoutPlan.self) { plan in

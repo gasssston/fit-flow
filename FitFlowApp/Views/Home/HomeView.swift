@@ -6,8 +6,7 @@ struct HomeView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeTabView()
-                .environmentObject(appState)
+            HomeTabView(selectedTab: $selectedTab)
                 .tabItem {
                     Label("Inicio", systemImage: "house.fill")
                 }
